@@ -11,6 +11,13 @@ export function SystemStatusCard({
   backendStatus,
   uptime,
 }: SystemStatusCardProps) {
+  const variant =
+    backendStatus === "online"
+      ? "success"
+      : backendStatus === "offline"
+        ? "error"
+        : "warning";
+
   return (
     <div className="flex items-center justify-center gap-3 mt-6">
       <a
@@ -19,7 +26,7 @@ export function SystemStatusCard({
         rel="noopener noreferrer"
       >
         <Status
-          status={backendStatus}
+          variant={variant}
           className="cursor-pointer hover:opacity-80 transition-opacity"
         >
           <StatusIndicator />

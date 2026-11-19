@@ -9,11 +9,12 @@ class Settings(BaseSettings):
     github_webhook_secret: str = ""
 
     openai_api_key: str = ""
+    gemini_api_key: str = ""
 
     qdrant_url: str = ""
     qdrant_api_key: str = ""
 
-    llm_model: str = "gpt-5.2"
+    llm_model: str = "gemini-3.5-flash-lite"
 
     environment: str = "development"
     frontend_url: str = "http://localhost:3000"

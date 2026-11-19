@@ -6,21 +6,27 @@ from app.services.github.client import github_request
 async def get_pr_diff(owner, repo, pr_number, token):
     resp = await github_request(
         "GET",
-        f"/repos/{owner}/pulls/{pr_number}",
+        f"/repos/{owner}/{repo}/pulls/{pr_number}",
         token,
         accept="application/vnd.github.v3.diff",
     )
+    if resp.status_code != 200:
+        return ""
     return resp.text
 
 
 async def get_pr_files(owner, repo, pr_number, token):
     resp = await github_request(
         "GET",
-        f"/repos/{owner}/pulls/{pr_number}/files",
+        f"/repos/{owner}/{repo}/pulls/{pr_number}/files",
         token,
     )
+    if resp.status_code != 200:
+        return []
     files = resp.json()
-    filenames = [f["filename"] for f in files]
+    if not isinstance(files, list):
+        return []
+    filenames = [f["filename"] for f in files if isinstance(f, dict) and "filename" in f]
     return filenames
 
 
@@ -35,9 +41,10 @@ async def post_comment(owner, repo, issue_number, comment, token):
 
 
 async def create_branch(owner, repo, branch_name, from_ref, token):
+    clean_ref = from_ref.lstrip("/")
     resp = await github_request(
         "GET",
-        f"/repos/{owner}/{repo}/git/ref/heads{from_ref}",
+        f"/repos/{owner}/{repo}/git/ref/heads/{clean_ref}",
         token,
     )
     sha = resp.json()["object"]["sha"]
@@ -52,15 +59,18 @@ async def create_branch(owner, repo, branch_name, from_ref, token):
 
 
 async def create_or_update_file(
-    owner, repo, path, content, message, branch, token, sha
+    owner, repo, path, content, message, branch, token, sha=None
 ):
     body = {
         "message": message,
         "content": base64.b64encode(content.encode("utf-8")).decode("utf-8"),
         "branch": branch,
     }
+    if sha:
+        body["sha"] = sha
+
     resp = await github_request(
-        "PUT", f"/repo{owner}/{repo}/contents/{path}", token, json=body
+        "PUT", f"/repos/{owner}/{repo}/contents/{path}", token, json=body
     )
     return resp.json()
 

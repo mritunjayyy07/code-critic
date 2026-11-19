@@ -10,7 +10,7 @@ import type { Repository } from "./_components/log-filters";
 export default function LogsPage() {
   const { isSignedIn, isLoaded } = useAuthRedirect();
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [repositories, setRepositories] = useState<Respository[]>([]);
+  const [repositories, setRepositories] = useState<Repository[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const [filtering, setFiltering] = useState(false);
   const [typeFilter, setTypeFilter] = useState<"all" | "pr" | "issue">("all");

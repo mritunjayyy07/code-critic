@@ -3,19 +3,36 @@ import httpx
 from app.core.config import settings
 
 
+def get_base_url():
+    return (settings.frontend_url or "http://localhost:3000").rstrip("/")
+
+
 async def post(endpoint, data):
-    async with httpx.AsyncClient() as client:
-        await client.post(f"{settings.frontend_url}{endpoint}", json=data, timeout=10.0)
+    base_url = get_base_url()
+    path = "/" + endpoint.lstrip("/")
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(f"{base_url}{path}", json=data, timeout=10.0)
+            return resp
+    except Exception as e:
+        print(f"Error posting to frontend {path}: {e}")
+        return None
 
 
 async def fetch_custom_rules(installation_id):
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(
-            f"{settings.frontend_url}/api/rules/by-installation/{installation_id}",
-            timeout=10.0,
-        )
-
-        return resp.json().get("rules", [])
+    base_url = get_base_url()
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                f"{base_url}/api/rules/by-installation/{installation_id}",
+                timeout=10.0,
+            )
+            if resp.status_code == 200:
+                return resp.json().get("rules", [])
+            return []
+    except Exception as e:
+        print(f"Error fetching custom rules for installation {installation_id}: {e}")
+        return []
 
 
 async def log_pr_review(repo_full_name, pr_number, pr_title, pr_github_id):

@@ -49,7 +49,10 @@ export function NotificationContent() {
     notification: (typeof inboxNotifications)[0],
   ) => {
     const kind = notification.kind;
-    const activity = notification.activites.data;
+    const activity =
+      (notification as any).activities?.[0]?.data ||
+      (notification as any).activityData ||
+      {};
     const url = activity.url;
 
     switch (kind) {

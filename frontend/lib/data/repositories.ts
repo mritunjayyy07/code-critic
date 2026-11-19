@@ -16,17 +16,17 @@ export async function findRepoWithInstallation(repoFullName: string) {
 }
 
 export async function upsertRepository(
-  githubId: number,
+  githubId: number | bigint,
   name: string,
   fullName: string,
   installationId: string,
 ) {
   return prisma.repository.upsert({
     where: {
-      githubId,
+      githubId: BigInt(githubId),
     },
     create: {
-      githubId,
+      githubId: BigInt(githubId),
       name,
       fullName,
       installationId,
@@ -34,6 +34,7 @@ export async function upsertRepository(
     update: {
       name,
       fullName,
+      installationId,
     },
   });
 }
@@ -42,12 +43,13 @@ export async function updateIndexingStatus(
   repoFullName: string,
   status: string,
 ) {
+  const normalized = status === "COMPELETED" ? "COMPLETED" : status;
   return prisma.repository.updateMany({
     where: {
       fullName: repoFullName,
     },
     data: {
-      indexingStatus: status,
+      indexingStatus: normalized as any,
     },
   });
 }

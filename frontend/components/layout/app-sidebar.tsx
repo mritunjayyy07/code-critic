@@ -130,7 +130,7 @@ export function AppSidebar() {
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted-foreground">Chat Messages</span>
                   <span className="font-medium">
-                    {usage.chatMessagesUsed} / {usage.limits[usage.plan].chat}
+                    {usage.chatMessageUsed} / {usage.limit[usage.plan].chat}
                   </span>
                 </div>
 
@@ -138,7 +138,7 @@ export function AppSidebar() {
                   <div
                     className="h-2 bg-[#127A4D] rounded-full transition-all"
                     style={{
-                      width: `${(usage.chatMessagesUsed / usage.limits[usage.plan].chat) * 100}%`,
+                      width: `${(usage.chatMessageUsed / usage.limit[usage.plan].chat) * 100}%`,
                     }}
                   />
                 </div>

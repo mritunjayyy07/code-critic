@@ -61,14 +61,14 @@ export default function ChatPage() {
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
-        header: {
+        headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ question: userMessage }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.Error || "Failed to get response");
+      if (!res.ok) throw new Error(data.error || "Failed to get response");
       setMessages((prev) => [
         ...prev,
         {

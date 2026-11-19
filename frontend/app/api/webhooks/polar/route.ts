@@ -33,13 +33,14 @@ export const POST = Webhooks({
 
   onCustomerCreated: async (payload) => {
     const { id: customerId, email } = payload.data;
+    if (!email) return;
 
     await prisma.user.updateMany({
       where: {
         email,
       },
       data: {
-        polarCustomer: customerId,
+        polarCustomerId: customerId,
       },
     });
   },

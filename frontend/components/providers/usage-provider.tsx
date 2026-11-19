@@ -58,10 +58,10 @@ export function UsageProvider({ children }: { children: ReactNode }) {
       const data = await res.json();
       setUsage({
         plan: data.user.plan,
-        prsUsed: data.user.prsUsed,
-        prsCreated: data.user.prsCreated,
-        issuesUsed: data.user.issues,
-        chatMessageUsed: data.user.chatMessageUsed,
+        prsUsed: data.user.prsUsed ?? 0,
+        prsCreated: data.user.prsCreated ?? 0,
+        issuesUsed: data.user.issuesUsed ?? data.user.issues ?? 0,
+        chatMessageUsed: data.user.chatMessagesUsed ?? data.user.chatMessageUsed ?? 0,
         billingCycleStart: data.user.billingCycleStart,
         githubAccount: data.stats?.githubAccount || null,
         limit: data.limits,

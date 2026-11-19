@@ -18,30 +18,49 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [repoName, setRepoName] = useState<string | null>(null);
   const [indexingStatus, setIndexingStatus] = useState<string | null>(null);
+  const [repositories, setRepositories] = useState<any[]>([]);
+  const [githubAccount, setGithubAccount] = useState<string | null>(null);
   const [backendStatus, setBackendStatus] = useState<
     "online" | "offline" | "degraded" | "maintenance"
   >("online");
 
   const [uptime, setUptime] = useState<number | null>(null);
 
-  useEffect(() => {
-    const fetchRepo = async () => {
-      try {
-        const res = await fetch("/api/dashboard");
-        if (res.ok) {
-          const data = await res.json();
-          setRepoName(data.stats?.repoName || null);
-          setIndexingStatus(data.stats?.indexingStatus || null);
-        }
-      } catch (error) {
-        console.error("error fetchiug repo:", error);
+  const fetchRepo = async () => {
+    try {
+      const res = await fetch("/api/dashboard");
+      if (res.ok) {
+        const data = await res.json();
+        setRepoName(data.stats?.repoName || null);
+        setIndexingStatus(data.stats?.indexingStatus || null);
+        setRepositories(data.stats?.repositories || []);
+        setGithubAccount(data.stats?.githubAccount || null);
       }
-    };
+    } catch (error) {
+      console.error("error fetching repo:", error);
+    }
+  };
 
+  useEffect(() => {
     if (isSignedIn) {
       fetchRepo();
     }
   }, [isSignedIn]);
+
+  // Poll if any repo is currently indexing
+  useEffect(() => {
+    const isAnyIndexing =
+      indexingStatus === "INDEXING" ||
+      repositories.some((r) => r.indexingStatus === "INDEXING");
+
+    if (!isAnyIndexing) return;
+
+    const interval = setInterval(() => {
+      fetchRepo();
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [indexingStatus, repositories]);
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -105,14 +124,20 @@ export default function SettingsPage() {
         issuesUsed={usage?.issuesUsed ||0}
         chatMessagesUsed={usage?.chatMessageUsed ||0}
         limits={{
-          prs: usage?.limit[currentPlan].prs ||0,
-            prsCreated:usage?.limit[currentPlan].prsCreated ||0,
-              issues: usage?.limit[currentPlan].issues ||0,
-        chat: usage?.limit[currentPlan].chat ||0}
+          prs: usage?.limit[currentPlan].prs || 0,
+          prsCreated: usage?.limit[currentPlan].prsCreated || 0,
+          issues: usage?.limit[currentPlan].issues || 0,
+          chat: usage?.limit[currentPlan].chat || 0,
         }}
       />
 
-      <GithubCard repoName={repoName} indexingStatus={indexingStatus} />
+      <GithubCard
+        repoName={repoName}
+        indexingStatus={indexingStatus}
+        repositories={repositories}
+        githubAccount={githubAccount}
+        onRefresh={fetchRepo}
+      />
       <SystemStatusCard backendStatus={backendStatus} uptime={ uptime} />
     </div>
   );

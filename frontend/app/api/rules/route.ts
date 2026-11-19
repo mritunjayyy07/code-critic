@@ -16,13 +16,16 @@ export async function GET() {
     }
 
     const user = await getUserById(userId);
+    if (!user) {
+      return NextResponse.json({ rules: [] });
+    }
 
-    const rules = getRulesByUserId(user.id);
+    const rules = await getRulesByUserId(user.id);
 
     return NextResponse.json({ rules });
   } catch (error) {
     return NextResponse.json(
-      { error: "internal server used" },
+      { error: "Internal server error" },
       { status: 500 },
     );
   }
@@ -37,23 +40,36 @@ export async function POST(req: NextRequest) {
     }
 
     const { content } = await req.json();
+    if (!content) {
+      return NextResponse.json(
+        { error: "Content is required" },
+        { status: 400 },
+      );
+    }
 
     const user = await getUserById(userId);
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 },
+      );
+    }
 
-    const exsistingRulesCount = await countRulesByUserId(user.id);
+    const existingRulesCount = await countRulesByUserId(user.id);
     const maxRules = user.plan === "PRO" ? 50 : 5;
 
-    if (exsistingRulesCount >= maxRules) {
+    if (existingRulesCount >= maxRules) {
       return NextResponse.json(
-        { error: "max rules reached lil bro" },
+        { error: "Maximum number of rules reached" },
         { status: 403 },
       );
     }
 
     const rule = await createRule(user.id, content);
+    return NextResponse.json({ rule }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: "internal server used" },
+      { error: "Internal server error" },
       { status: 500 },
     );
   }

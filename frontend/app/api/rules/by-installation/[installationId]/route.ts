@@ -6,32 +6,41 @@ export async function GET(
   { params }: { params: Promise<{ installationId: string }> },
 ) {
   try {
-    const { installationId } = await params
-    const installationIdNum = parseInt(installationId)
+    const { installationId } = await params;
+    const installationIdNum = parseInt(installationId, 10);
+
+    if (isNaN(installationIdNum)) {
+      return NextResponse.json({ rules: [] });
+    }
 
     const installation = await prisma.installation.findUnique({
       where: {
-        installationId: installationIdNum
+        installationId: installationIdNum,
       },
       include: {
         user: {
           include: {
             rules: {
-              order: {
-                createdAt: "asc"
-    }
-    }
-    }
-    }
-    }
-    })
+              orderBy: {
+                createdAt: "asc",
+              },
+            },
+          },
+        },
+      },
+    });
 
-    const rules = installation.user.rules.map((rule) => rule.content)
+    if (!installation || !installation.user) {
+      return NextResponse.json({ rules: [] });
+    }
 
-    return NextResponse.json({rules})
-  }catch (error) {
+    const rules = installation.user.rules.map((rule) => rule.content);
+
+    return NextResponse.json({ rules });
+  } catch (error) {
     return NextResponse.json(
-      { error: "internal server used" },
-      { status: 500 },
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

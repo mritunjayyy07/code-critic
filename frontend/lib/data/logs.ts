@@ -141,6 +141,7 @@ export async function getDashboardStats(userId: string) {
     where: { id: userId },
     include: {
       installations: {
+        orderBy: { createdAt: "desc" },
         include: {
           repositories: {
             include: {
@@ -156,7 +157,7 @@ export async function getDashboardStats(userId: string) {
   if (!user) return null;
 
   const installation = user.installations[0];
-  const repositories = installation?.repositories || [];
+  const repositories = user.installations.flatMap((inst) => inst.repositories);
 
   let totalPRs = 0;
   let totalIssues = 0;

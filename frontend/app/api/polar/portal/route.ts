@@ -7,11 +7,18 @@ export const GET = CustomerPortal({
   accessToken: process.env.POLAR_ACCESS_TOKEN!,
   getCustomerId: async (req: NextRequest) => {
     const { userId } = await auth();
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },
     });
+
+    if (!user?.polarCustomerId) {
+      throw new Error("No Polar customer ID found");
+    }
 
     return user.polarCustomerId;
   },

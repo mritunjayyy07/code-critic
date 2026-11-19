@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CodeRabbit Clone",
-  description: "AI-powered code reviews for Gi`tHub",
+  title: "Code Critic",
+  description: "AI-powered code review platform",
 };
 
 export default function RootLayout({

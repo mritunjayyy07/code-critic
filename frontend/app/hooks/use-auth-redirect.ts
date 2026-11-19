@@ -1,9 +1,8 @@
-"use-client";
+"use client";
 import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constant";
-import { isSymbolObject } from "node:util/types";
 
 export function useAuthRedirect() {
   const { isSignedIn, isLoaded } = useAuth();

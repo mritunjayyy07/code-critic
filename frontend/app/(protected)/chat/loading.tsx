@@ -27,8 +27,8 @@ export default function ChatLoading() {
       </div>
       <div className="p-4">
         <div className="max-w-3xl mx-auto">
-
-        <Skeleton className="h-12 w-full rounded-full" />
+          <Skeleton className="h-12 w-full rounded-full" />
+        </div>
       </div>
     </div>
   );

@@ -114,7 +114,7 @@ export function LogFilters({
                   mode="single"
                   selected={startDate}
                   onSelect={onStartDateChange}
-                  initialFocus
+                  autoFocus
                 />
               </PopoverContent>
             </Popover>
@@ -137,7 +137,7 @@ export function LogFilters({
                   mode="single"
                   selected={endDate}
                   onSelect={onEndDateChange}
-                  initialFocus
+                  autoFocus
                 />
               </PopoverContent>
             </Popover>
